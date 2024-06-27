@@ -1,7 +1,7 @@
 FROM php:7.4-fpm
 
 # Set working directory
-WORKDIR /var/www/html
+WORKDIR /app/
 
 # Install dependencies
 RUN apt-get update && apt-get install -y \
@@ -31,10 +31,16 @@ RUN docker-php-ext-install gd
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Copy existing application directory contents
-COPY . /var/www/html
+COPY . /app/
 
 # Copy existing application directory permissions
-COPY --chown=www-data:www-data . /var/www/html
+COPY --chown=www-data:www-data . /app/
+
+# Add Nixpacks configuration
+COPY .nixpacks/nixpkgs-5148520bfab61f99fd25fb9ff7bfbb50dad3c9db.nix .nixpacks/nixpkgs-5148520bfab61f99fd25fb9ff7bfbb50dad3c9db.nix
+
+# Run Nix environment setup
+RUN nix-env -if .nixpacks/nixpkgs-5148520bfab61f99fd25fb9ff7bfbb50dad3c9db.nix && nix-collect-garbage -d
 
 # Expose port 9000 and start php-fpm server
 EXPOSE 9000
