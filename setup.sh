@@ -42,3 +42,9 @@ echo "Creating storage symbolic link..."
 php artisan storage:link
 
 echo "Laravel setup completed successfully."
+
+
+php artisan config:clear
+php artisan cache:clear
+php artisan route:clear
+php artisan view:clear
