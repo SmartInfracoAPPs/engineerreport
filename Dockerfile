@@ -1,41 +1,25 @@
+# Use an appropriate base image
 FROM php:7.4-fpm
 
 # Set working directory
-WORKDIR /var/www/html
+WORKDIR /app
+
+# Copy application files
+COPY . /app/
 
 # Install dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpng-dev \
-    libjpeg62-turbo-dev \
-    libfreetype6-dev \
-    locales \
-    zip \
-    jpegoptim optipng pngquant gifsicle \
-    vim \
-    unzip \
-    git \
-    curl \
-    && pecl install xdebug \
-    && docker-php-ext-enable xdebug
+RUN apt-get update && \
+    apt-get install -y git zip unzip && \
+    docker-php-ext-install pdo_mysql && \
+    mkdir -p /var/log/nginx && \
+    mkdir -p /var/cache/nginx && \
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
+    composer install --ignore-platform-reqs --no-interaction --optimize-autoloader
 
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+# Expose port if necessary
+# EXPOSE 8000
 
-# Install extensions
-RUN docker-php-ext-install pdo_mysql mbstring zip exif pcntl
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg
-RUN docker-php-ext-install gd
+# Command to run the application
+# CMD ["php", "artisan", "serve", "--host=0.0.0.0"]
 
-# Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# Copy existing application directory contents
-COPY . /var/www/html
-
-# Copy existing application directory permissions
-COPY --chown=www-data:www-data . /var/www/html
-
-# Expose port 9000 and start php-fpm server
-EXPOSE 9000
-CMD ["php-fpm"]
+# Adjust CMD as per your application's requirements
