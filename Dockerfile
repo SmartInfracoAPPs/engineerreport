@@ -27,7 +27,7 @@ RUN apt-get update && \
 # Copy the built assets from Stage 1
 COPY --from=build /app/public /app/public
 
-# Nginx Configuration
+# Copy Nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
 
 # Expose port if necessary
