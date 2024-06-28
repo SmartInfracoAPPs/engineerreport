@@ -18,6 +18,8 @@ services:
       - .:/var/www/html
     ports:
       - "80:80"
+      - "21:21"
+      - "10000-10100:10000-10100"
     command: /bin/sh -c "./setup.sh && php artisan serve --host=0.0.0.0 --port=80"
 
 networks:
