@@ -41,7 +41,7 @@ php artisan view:cache
 echo "Creating storage symbolic link..."
 php artisan storage:link
 
-# Clear various caches
+# Clear caches
 php artisan config:clear
 php artisan cache:clear
 php artisan route:clear
