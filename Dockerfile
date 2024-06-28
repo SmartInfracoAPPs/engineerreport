@@ -1,33 +1,15 @@
 # Use an appropriate base image
-FROM php:7.4-fpm
+FROM nginx:latest
 
-# Set working directory
-WORKDIR /app
+# Copy custom Nginx configuration file
+COPY nginx.conf /etc/nginx/nginx.conf
 
-# Copy application files
-COPY . /app/
+# Remove default configuration symlink
+RUN rm /etc/nginx/conf.d/default.conf
 
-# Install dependencies
-RUN apt-get update && \
-    apt-get install -y git zip unzip && \
-    docker-php-ext-install pdo_mysql && \
-    mkdir -p /var/log/nginx && \
-    mkdir -p /var/cache/nginx && \
-    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
-    composer install --ignore-platform-reqs --no-interaction --optimize-autoloader
-
-# Install Nginx
-RUN apt-get install -y nginx
-
-# Remove default server definition
-RUN rm /etc/nginx/sites-enabled/default
-
-# Add custom server definition
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Expose ports
+# Expose ports if necessary (port 80 for HTTP and port 443 for HTTPS)
 EXPOSE 80
 EXPOSE 443
 
-# Command to run the application
-CMD service nginx start && php-fpm
+# Command to run Nginx
+CMD ["nginx", "-g", "daemon off;"]
