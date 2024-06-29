@@ -52,7 +52,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'url' => env('APP_URL', 'https://api-server.197.253.124.146.sslip.io'),
 
     /*
     |--------------------------------------------------------------------------
