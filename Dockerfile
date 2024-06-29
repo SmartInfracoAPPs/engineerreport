@@ -11,7 +11,7 @@ RUN apt-get install -y nodejs
 
 # Copy Nginx mime.types
 RUN mkdir -p /etc/nginx/
-# RUN cp /etc/nginx/mime.types /etc/nginx/
+RUN cp /mime.types /etc/nginx/
 # Copy Nginx configuration files
 RUN mkdir -p /etc/nginx/snippets/
 RUN cp /etc/nginx/snippets/fastcgi-php.conf /etc/nginx/snippets/
