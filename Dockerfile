@@ -12,8 +12,8 @@ RUN curl -sL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y git zip unzip
 
 # Copy Nginx mime.types file to the right location
-RUN mkdir -p /etc/nginx/ && \
-    cp /usr/share/nginx/mime.types /etc/nginx/mime.types
+# RUN mkdir -p /etc/nginx/ && \
+#     cp /usr/share/nginx/mime.types /etc/nginx/mime.types
 
 # Switch to the www-data user
 USER www-data
