@@ -18,8 +18,22 @@ services:
       - .:/var/www/html
     ports:
       - "80:80"
-      - "443:443"
-    command: /bin/sh -c "./setup.sh && nginx -g 'daemon off;'"
+    labels:
+      - traefik.enable=true
+      - traefik.http.middlewares.gzip.compress=true
+      - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+      - traefik.http.routers.http-0-lgkcws4.entryPoints=http
+      - traefik.http.routers.http-0-lgkcws4.rule=Host(`api-server.197.253.124.146.sslip.io`) && PathPrefix(`/`)
+      - traefik.http.routers.http-0-lgkcws4.service=http-0-lgkcws4
+      - traefik.http.routers.https-0-lgkcws4.entryPoints=https
+      - traefik.http.routers.https-0-lgkcws4.middlewares=gzip
+      - traefik.http.routers.https-0-lgkcws4.rule=Host(`api-server.197.253.124.146.sslip.io`) && PathPrefix(`/`)
+      - traefik.http.routers.https-0-lgkcws4.service=https-0-lgkcws4
+      - traefik.http.routers.https-0-lgkcws4.tls.certresolver=letsencrypt
+      - traefik.http.routers.https-0-lgkcws4.tls=true
+      - traefik.http.services.http-0-lgkcws4.loadbalancer.server.port=80
+      - traefik.http.services.https-0-lgkcws4.loadbalancer.server.port=80
+    command: /bin/sh -c "./setup.sh && php-fpm"
 
 networks:
   default:

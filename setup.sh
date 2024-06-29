@@ -21,12 +21,6 @@ npm install
 echo "Building assets..."
 npm run production
 
-# Check if the migration table exists and rollback migrations
-if php artisan migrate:status >/dev/null 2>&1; then
-  echo "Rolling back previous migrations..."
-  php artisan migrate:rollback --force
-fi
-
 # Run database migrations
 echo "Running database migrations..."
 php artisan migrate --force
