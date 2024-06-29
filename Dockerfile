@@ -1,33 +1,23 @@
-# Use an appropriate base image
-FROM php:7.4-fpm
+FROM serversideup/php:8.3-fpm-nginx
 
-# Install Nginx
-RUN apt-get update && \
-    apt-get install -y nginx
+ENV PHP_OPCACHE_ENABLE=1
 
-# Set working directory
-WORKDIR /app
+USER root
+
+# Install necessary packages and Composer
+RUN curl -sL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get update && \
+    apt-get install -y nodejs git zip unzip && \
+    docker-php-ext-install pdo_mysql && \
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Switch to www-data user
+USER www-data
 
 # Copy application files
-COPY . /app/
+COPY --chown=www-data:www-data . /var/www/html
 
-# Copy Nginx configuration files
-COPY nginx.conf /etc/nginx/nginx.conf
-COPY nginx_ssl.conf /etc/nginx/conf.d/default.conf
-
-# Install PHP extensions and Composer
-RUN apt-get update && \
-    apt-get install -y git zip unzip && \
-    docker-php-ext-install pdo_mysql && \
-    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
-    composer install --ignore-platform-reqs --no-interaction --optimize-autoloader
-
-# Obtain SSL certificates using Certbot
-RUN certbot certonly --standalone -d api-server.197.253.124.146.sslip.io --non-interactive --agree-tos --email your-email@example.com
-
-
-# Expose ports for HTTP and HTTPS
-EXPOSE 80 443
-
-# Command to run the application
-CMD ["nginx", "-g", "daemon off;"]
+# Install dependencies
+RUN composer install --no-interaction --optimize-autoloader --no-dev && \
+    npm install && \
+    npm run build
