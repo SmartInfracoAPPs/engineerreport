@@ -1,6 +1,7 @@
 # Use the serversideup/php:8.3-fpm-nginx base image
 FROM serversideup/php:8.3-fpm-nginx
 
+# Set environment variables
 ENV PHP_OPCACHE_ENABLE=1
 
 # Switch to root user to install packages and perform configurations
@@ -12,15 +13,7 @@ RUN curl -sL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y git zip unzip && \
     npm install -g npm@latest
 
-# # Copy Nginx mime.types file to the right location
-# RUN mkdir -p /etc/nginx/ && \
-#     cp  /mime.types /etc/nginx/mime.types
-
-# # Copy the fastcgi-php.conf file to the correct location
-# RUN mkdir -p /etc/nginx/snippets && \
-#     cp /fastcgi-php.conf /etc/nginx/snippets/
-
-# Switch to the www-data user
+# Switch back to the www-data user
 USER www-data
 
 # Set the working directory
