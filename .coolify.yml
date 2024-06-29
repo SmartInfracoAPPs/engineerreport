@@ -17,7 +17,7 @@ services:
     volumes:
       - .:/app
     ports:
-      - "80:80"
+      - "443:443"
     command: /bin/sh -c "./setup.sh && php-fpm"
 
 networks:
