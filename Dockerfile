@@ -1,23 +1,26 @@
+# Dockerfile
+
 FROM serversideup/php:8.3-fpm-nginx
 
 ENV PHP_OPCACHE_ENABLE=1
 
 USER root
 
-# Install necessary packages and Composer
-RUN curl -sL https://deb.nodesource.com/setup_20.x | bash - && \
-    apt-get update && \
-    apt-get install -y nodejs git zip unzip && \
-    docker-php-ext-install pdo_mysql && \
-    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN curl -sL https://deb.nodesource.com/setup_20.x | bash -
+RUN apt-get install -y nodejs
 
-# Switch to www-data user
-USER www-data
+# Copy Nginx mime.types
+RUN mkdir -p /etc/nginx/
+RUN cp /etc/nginx/mime.types /etc/nginx/
+# Copy Nginx configuration files
+RUN mkdir -p /etc/nginx/snippets/
+RUN cp /etc/nginx/snippets/fastcgi-php.conf /etc/nginx/snippets/
 
-# Copy application files
 COPY --chown=www-data:www-data . /var/www/html
 
-# Install dependencies
-RUN composer install --no-interaction --optimize-autoloader --no-dev && \
-    npm install && \
-    npm run build
+USER www-data
+
+RUN npm install
+RUN npm run build
+
+RUN composer install --no-interaction --optimize-autoloader --no-dev
