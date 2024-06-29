@@ -1,15 +1,9 @@
-# Stage 1: Build
-FROM node:16-alpine as build
-
-WORKDIR /app
-
-COPY package.json package-lock.json ./
-RUN npm install
-COPY . .
-RUN npm run production
-
-# Stage 2: Production
+# Use an appropriate base image
 FROM php:7.4-fpm
+
+# Install Nginx
+RUN apt-get update && \
+    apt-get install -y nginx
 
 # Set working directory
 WORKDIR /app
@@ -17,9 +11,13 @@ WORKDIR /app
 # Copy application files
 COPY . /app/
 
+# Copy Nginx configuration files
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY nginx_ssl.conf /etc/nginx/conf.d/nginx_ssl.conf
+
 # Install dependencies
 RUN apt-get update && \
-    apt-get install -y git zip unzip nginx certbot && \
+    apt-get install -y git zip unzip && \
     docker-php-ext-install pdo_mysql && \
     curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
     composer install --ignore-platform-reqs --no-interaction --optimize-autoloader
@@ -27,14 +25,9 @@ RUN apt-get update && \
 # Obtain SSL certificates using Certbot
 RUN certbot certonly --standalone -d api-server.197.253.124.146.sslip.io --non-interactive --agree-tos --email your-email@example.com
 
-# Copy the built assets from Stage 1
-COPY --from=build /app/public /app/public
-
-# Copy Nginx configuration
-COPY nginx.conf /etc/nginx/nginx.conf
 
 # Expose port if necessary
-EXPOSE 443
+EXPOSE 80 443
 
-# Start Nginx and PHP-FPM
-CMD service nginx start && php-fpm
+# Command to run the application
+CMD ["nginx", "-g", "daemon off;"]

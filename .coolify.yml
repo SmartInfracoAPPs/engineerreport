@@ -15,10 +15,11 @@ services:
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
     volumes:
-      - .:/app
+      - .:/var/www/html
     ports:
+      - "80:80"
       - "443:443"
-    command: /bin/sh -c "./setup.sh && php-fpm"
+    command: /bin/sh -c "./setup.sh && nginx -g 'daemon off;'"
 
 networks:
   default:
