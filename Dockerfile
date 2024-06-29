@@ -1,17 +1,33 @@
-FROM serversideup/php:8.3-fpm-nginx
+# Use an appropriate base image
+FROM php:7.4-fpm
 
-ENV PHP_OPCACHE_ENABLE=1
+# Install Nginx
+RUN apt-get update && \
+    apt-get install -y nginx
 
-USER root
+# Set working directory
+WORKDIR /app
 
-RUN curl -sL https://deb.nodesource.com/setup_20.x | bash - && \
-    apt-get install -y nodejs && \
-    apt-get clean
+# Copy application files
+COPY . /app/
 
-COPY --chown=www-data:www-data . /var/www/html
+# Copy Nginx configuration files
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY nginx_ssl.conf /etc/nginx/conf.d/default.conf
 
-USER www-data
+# Install PHP extensions and Composer
+RUN apt-get update && \
+    apt-get install -y git zip unzip && \
+    docker-php-ext-install pdo_mysql && \
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
+    composer install --ignore-platform-reqs --no-interaction --optimize-autoloader
 
-RUN composer install --no-interaction --optimize-autoloader --no-dev && \
-    npm install && \
-    npm run build
+# Obtain SSL certificates using Certbot
+RUN certbot certonly --standalone -d api-server.197.253.124.146.sslip.io --non-interactive --agree-tos --email your-email@example.com
+
+
+# Expose ports for HTTP and HTTPS
+EXPOSE 80 443
+
+# Command to run the application
+CMD ["nginx", "-g", "daemon off;"]
