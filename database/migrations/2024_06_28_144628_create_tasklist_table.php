@@ -10,12 +10,12 @@ class CreateTasklistTable extends Migration
         Schema::create('tasklist', function (Blueprint $table) {
             $table->increments('task_id');
             $table->string('task_status', 50);
-            $table->unsignedInteger('field_engineer_id');
+            $table->unsignedBigInteger('field_engineer_id'); // Ensure this references the correct column type
             $table->string('site_id', 255);
             $table->text('task_description');
             $table->timestamps();
 
-            $table->foreign('field_engineer_id')->references('id')->on('users');
+            $table->foreign('field_engineer_id')->references('id')->on('users')->onDelete('cascade'); // Correct reference
         });
     }
 
