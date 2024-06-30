@@ -15,7 +15,7 @@ class CreateTasklistTable extends Migration
             $table->text('task_description');
             $table->timestamps();
 
-            $table->foreign('field_engineer_id')->references('user_id')->on('users');
+            $table->foreign('field_engineer_id')->references('id')->on('users');
         });
     }
 
