@@ -10,7 +10,7 @@ class CreateChecklistTable extends Migration
     {
         Schema::create('checklist', function (Blueprint $table) {
             $table->increments('checklist_id');
-            $table->unsignedInteger('task_id');
+            $table->unsignedBigInteger('task_id');
             $table->text('checklist_item');
             $table->string('status', 50);
             $table->timestamps();
