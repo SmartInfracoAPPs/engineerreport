@@ -11,11 +11,12 @@ class CreateImagesTable extends Migration
     public function up()
     {
         Schema::create('images', function (Blueprint $table) {
-            $table->id('image_id');
-            $table->unsignedBigInteger('task_id');
-            $table->foreign('task_id')->references('task_id')->on('tasklist');
+            $table->bigIncrements('image_id'); // Ensure this is BigIncrements if using BigInteger
+            $table->unsignedBigInteger('task_id'); // Match this with tasklist's task_id type
             $table->string('image_url', 255);
             $table->timestamps();
+
+            $table->foreign('task_id')->references('task_id')->on('tasklist')->onDelete('cascade');
         });
     }
 
